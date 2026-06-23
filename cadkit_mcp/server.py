@@ -247,6 +247,72 @@ def _shell_json(face_ids, thickness, name: str) -> Dict[str, Any]:
         _qty("thickness", _scalar_expr(thickness)),
         _flag("oppositeDirection", True)])  # shell inward (keep outer dimensions)
 
+_HOLE_TEMPLATE = json.loads((pathlib.Path(__file__).parent / "hole_template.json").read_text())
+_HOLE_STYLE = {"simple": "SIMPLE", "counterbore": "C_BORE", "countersink": "C_SINK"}
+
+def _hole_native_json(locations_query, scope_ids, style: str, diameter, depth, name: str,
+                      up: bool = False, through: bool = False, cbore_dia=None, cbore_depth=None,
+                      csink_dia=None, csink_angle=90) -> Dict[str, Any]:
+    """The native Onshape `hole` feature (V3) — proper hole with callouts, counterbore/countersink.
+
+    Built from the full known-good 160-param template (a trimmed/guessed set regenerates to ERROR);
+    we override only the meaningful fields. `locations_query` is a sketch-point query; `up` flips
+    the drill direction (oppositeDirection) — set it so the hole drills INTO the part. V3 fields
+    and their legacy mirrors are both set so the version-matching logic stays consistent."""
+    feat = json.loads(json.dumps(_HOLE_TEMPLATE))   # deep copy
+    feat["name"] = name
+    se = _HOLE_STYLE[style]
+    end = "THROUGH" if through else "BLIND"
+    by_id = {p.get("parameterId"): p for p in feat["parameters"]}
+
+    def setv(pid, value):
+        if pid in by_id: by_id[pid]["value"] = value
+
+    def setx(pid, expr):
+        if pid in by_id: by_id[pid]["expression"] = expr
+
+    setv("styleV2", se); setv("style", se)
+    setv("endStyleV2", end); setv("endStyle", end)
+    setv("oppositeDirection", bool(up))
+    by_id["locations"]["queries"] = [locations_query]
+    by_id["scope"]["queries"] = [{"btType": "BTMIndividualQuery-138", "deterministicIds": list(scope_ids)}]
+    for pid in ("holeDiameterV3", "holeDiameterV2", "holeDiameter"):
+        setx(pid, _scalar_expr(diameter))
+    if not through:
+        for pid in ("holeDepthV3", "holeDepth"):
+            setx(pid, _scalar_expr(depth))
+    if style == "counterbore":
+        for pid in ("cBoreDiameterV3", "cBoreDiameter"): setx(pid, _scalar_expr(cbore_dia))
+        for pid in ("cBoreDepthV3", "cBoreDepth"): setx(pid, _scalar_expr(cbore_depth))
+    elif style == "countersink":
+        for pid in ("cSinkDiameterV3", "cSinkDiameter"): setx(pid, _scalar_expr(csink_dia))
+        for pid in ("cSinkAngleV3", "cSinkAngle"): setx(pid, _scalar_expr(csink_angle, "deg"))
+    return {"feature": feat}
+
+
+_SOLID_BODIES_FS = ("function(context is Context, queries){ var o=[]; "
+                    "for (var x in evaluateQuery(context, qBodyType(qEverything(EntityType.BODY), BodyType.SOLID)))"
+                    "{ o=append(o, transientQueriesToStrings(x)); } return o; }")
+
+async def _native_hole(doc, ws, elem, plane, centers, style, diameter, depth, name,
+                       up=False, through=False, **kw):
+    """Drive the native Hole feature: a points sketch at the centers, then the hole referencing
+    those points. Returns (add_feature response, points-sketch featureId)."""
+    sk = SketchSession(doc, ws, elem, plane, f"{name} locations")
+    for c in centers:
+        sk.add_point(tuple(c))
+    rs = await PS.add_feature(doc, ws, elem, sk.build())
+    sfid = rs["feature"]["featureId"]
+    loc_ids = sel.parse_ids(await FS.evaluate(doc, ws, elem, sel.fs_sketch_vertices(sfid)))
+    locq = {"btType": "BTMIndividualQuery-138",
+            "queryString": f'query=qCreatedBy(makeId("{sfid}"), EntityType.VERTEX);',
+            "deterministicIds": loc_ids}
+    scope = sel.parse_ids(await FS.evaluate(doc, ws, elem, _SOLID_BODIES_FS))
+    feat = _hole_native_json(locq, scope, style, diameter, depth, name, up=up, through=through, **kw)
+    r = await PS.add_feature(doc, ws, elem, feat)
+    return r, sfid
+
+
 # Feature-based pattern/mirror: repeat whole FEATURES (patternType=FEATURE + instanceFunction),
 # not faces. Verified against hand-built examples — face-based variants errored on regenerate.
 def _mirror_json(feature_ids, plane_id: str, name: str) -> Dict[str, Any]:
@@ -357,16 +423,18 @@ async def list_tools() -> List[Tool]:
              inputSchema={"type": "object", "properties": {**ds, "edgeIds": {"type": "array", "items": {"type": "string"}},
                           "distance": {"type": ["number", "string"]}, "name": {"type": "string"}},
                           "required": ["documentId","workspaceId","elementId","edgeIds","distance"]}),
-        Tool(name="cad_hole", description="Cut cylindrical hole(s): circles at the given centers on a plane/face, removed "
-             "by a blind extrude. diameter/depth accept numbers or #variables. plane is Front/Top/Right OR a face id "
-             "(from cad_find_faces). style='counterbore' adds a wider, shallow recess (needs cboreDiameter + cboreDepth) "
-             "for a bolt head; default style='simple'.",
+        Tool(name="cad_hole", description="Hole(s) at the given centers on a plane/face. diameter/depth accept numbers or "
+             "#variables. plane is Front/Top/Right OR a face id (from cad_find_faces). style: 'simple' (default) | "
+             "'counterbore' (needs cboreDiameter + cboreDepth) | 'countersink' (needs csinkDiameter; csinkAngle default 90) "
+             "— counterbore/countersink use the native Hole feature (proper callouts). Set up=true if the hole reports "
+             "'none intersected' (flips the drill direction). through=true for a through-all hole.",
              inputSchema={"type": "object", "properties": {**ds, "plane": {"type": "string"},
                           "centers": {"type": "array", "items": {"type": "array", "items": {"type": "number"}}},
                           "diameter": {"type": ["number", "string"]}, "depth": {"type": ["number", "string"]},
-                          "style": {"type": "string", "enum": ["simple", "counterbore"]},
+                          "style": {"type": "string", "enum": ["simple", "counterbore", "countersink"]},
                           "cboreDiameter": {"type": ["number", "string"]}, "cboreDepth": {"type": ["number", "string"]},
-                          "name": {"type": "string"}},
+                          "csinkDiameter": {"type": ["number", "string"]}, "csinkAngle": {"type": ["number", "string"]},
+                          "up": {"type": "boolean"}, "through": {"type": "boolean"}, "name": {"type": "string"}},
                           "required": ["documentId","workspaceId","elementId","plane","centers","diameter","depth"]}),
         Tool(name="cad_revolve", description="Revolve a sketch region about an axis edge. angle in degrees (number/#var); "
              "omit angle for a full 360 revolve. operation: NEW/ADD/REMOVE/INTERSECT.",
@@ -542,34 +610,35 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             return _feat_result(r)
 
         if name == "cad_hole":
-            # A hole = one or more coaxial REMOVE cuts on the same plane/face. A counterbore is the
-            # bore (narrow, full depth) plus a wider, shallow cut — composed from cadkit's verified
-            # primitives rather than Onshape's native (versioned, ~150-param) Hole feature.
+            # simple -> a light circle + REMOVE extrude. counterbore/countersink -> the native
+            # Hole feature (proper hole, callouts, exact profile). `up` flips the drill direction
+            # so it cuts INTO the part (set up=true if the result reports "none intersected").
             doc, ws, elem = a["documentId"], a["workspaceId"], a["elementId"]
             plane, centers, nm = a["plane"], a["centers"], a.get("name", "Hole")
             style = a.get("style", "simple")
-
-            async def _drill(dia, depth, sub):
-                sk = SketchSession(doc, ws, elem, plane, f"{nm} {sub} sketch")
+            if style == "simple":
+                sk = SketchSession(doc, ws, elem, plane, f"{nm} sketch")
                 for c in centers:
                     cid = sk.add_circle(tuple(c), 0.5)        # radius refined by the diameter dim
-                    sk.dim_diameter(cid, dia)
+                    sk.dim_diameter(cid, a["diameter"])
                 rs = await PS.add_feature(doc, ws, elem, sk.build())
                 sfid = rs["feature"]["featureId"]
                 re = await PS.add_feature(doc, ws, elem,
-                    _extrude_json(sfid, depth, "REMOVE", f"{nm} {sub}"))
-                return sfid, re.get("featureState", {}).get("featureStatus"), re["feature"]["featureId"]
-
-            sfid, status, fid = await _drill(a["diameter"], a["depth"], "bore")
-            out = {"status": status, "featureId": fid, "sketchFeatureId": sfid}
+                    _extrude_json(sfid, a["depth"], "REMOVE", nm))
+                return _feat_result(re, sketchFeatureId=sfid)
             if style == "counterbore":
                 if not (a.get("cboreDiameter") and a.get("cboreDepth")):
                     return _txt(json.dumps({"error": "style=counterbore needs cboreDiameter + cboreDepth"}))
-                _, cstatus, _ = await _drill(a["cboreDiameter"], a["cboreDepth"], "cbore")
-                out["counterbore"] = cstatus
-            elif style != "simple":
-                return _txt(json.dumps({"error": f"unknown hole style '{style}' (simple|counterbore)"}))
-            return _txt(json.dumps(out))
+                kw = {"cbore_dia": a["cboreDiameter"], "cbore_depth": a["cboreDepth"]}
+            elif style == "countersink":
+                if not a.get("csinkDiameter"):
+                    return _txt(json.dumps({"error": "style=countersink needs csinkDiameter"}))
+                kw = {"csink_dia": a["csinkDiameter"], "csink_angle": a.get("csinkAngle", 90)}
+            else:
+                return _txt(json.dumps({"error": f"unknown hole style '{style}' (simple|counterbore|countersink)"}))
+            r, sfid = await _native_hole(doc, ws, elem, plane, centers, style, a["diameter"], a["depth"],
+                                         nm, up=a.get("up", False), through=a.get("through", False), **kw)
+            return _feat_result(r, sketchFeatureId=sfid)
 
         if name == "cad_revolve":
             r = await PS.add_feature(a["documentId"], a["workspaceId"], a["elementId"],

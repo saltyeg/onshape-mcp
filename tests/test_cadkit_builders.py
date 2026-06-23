@@ -42,6 +42,21 @@ def test_diagnostics_wellformed_when_grounded_and_dimensioned():
     assert d["grounded"] and d["dimensions"] == 1 and d["wellFormed"]
 
 
+def test_native_hole_overrides_template_fields():
+    locq = {"btType": "BTMIndividualQuery-138", "deterministicIds": ["II"]}
+    j = S._hole_native_json(locq, ["JHD"], "countersink", "#d", 0.8, "csk",
+                            up=True, csink_dia=0.55, csink_angle=82)["feature"]
+    p = {x["parameterId"]: x for x in j["parameters"]}
+    assert j["featureType"] == "hole"
+    assert p["styleV2"]["value"] == "C_SINK" and p["style"]["value"] == "C_SINK"
+    assert p["oppositeDirection"]["value"] is True
+    assert p["holeDiameterV3"]["expression"] == "#d"          # passes #variables through
+    assert p["cSinkDiameterV3"]["expression"] == "0.55 in"
+    assert p["cSinkAngleV3"]["expression"] == "82 deg"
+    assert p["locations"]["queries"] == [locq]
+    assert p["scope"]["queries"][0]["deterministicIds"] == ["JHD"]
+
+
 def test_add_point_emits_sketch_point_in_meters():
     s = _session()
     pid = s.add_point((1.0, 0.5))

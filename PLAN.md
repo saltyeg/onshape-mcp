@@ -57,20 +57,20 @@ size snaps to its `#variable` values); semantic concave-edge → fillet; REMOVE-
 
 ## P1 — Features needed for real parts
 
-5. **`cad_hole`** ✅ *shipped — simple + counterbore* — circles at given centers on a plane/face +
-   a blind `REMOVE` extrude; diameter/depth accept `#variable`; multiple centers per call.
-   `style="counterbore"` adds a second wider/shallow coaxial cut (needs `cboreDiameter` +
-   `cboreDepth`) — a **composite** counterbore built from cadkit's verified primitives, confirmed
-   live (`scripts/smoke_counterbore.py`: bore r=0.125 + cbore r=0.3).
-   - **Countersink: TODO** — same composite idea (bore + a chamfer on the mouth edge; equal-distance
-     chamfer ≈ 90° countersink). Needs the circular mouth edge found via `cad_find_edges`.
-   - **Native Onshape `hole` feature: deferred / blocked.** Would give one editable feature with
-     proper hole callouts (drawings/BOM) + tapped threads. Spec recovered (`holeVersion=V3`,
-     `styleV2=HoleStyle.C_BORE|SIMPLE|C_SINK`, `cBore*V3`/`cSink*V3`, `locations` = sketch-point
-     vertices, `scope`), and `sketch.add_point` + `selection.fs_sketch_vertices` exist to feed it —
-     but the posted feature regenerates to **ERROR even with the full known-good param set**, and
-     the REST API does not surface the error reason. Next attempt needs the error read from the
-     Onshape UI (build it by hand, inspect), not blind iteration.
+5. **`cad_hole`** ✅ *shipped — simple + counterbore + countersink* —
+   - `style="simple"` (default): circles at the centers + a blind `REMOVE` extrude (light, no
+     extra sketch). diameter/depth accept `#variable`; multiple centers per call.
+   - `style="counterbore"` / `style="countersink"`: the **native Onshape Hole feature** (proper hole
+     with callouts, exact profile). Built from the full known-good 160-param template
+     (`cadkit_mcp/hole_template.json`) with only the meaningful fields overridden — a trimmed/guessed
+     param set regenerates to ERROR. Drive it with a points sketch (`sketch.add_point` →
+     `selection.fs_sketch_vertices` → the hole's `locations`). `up=true` flips the drill direction
+     (the feature errors "none of the holes intersected a part" if it drills away from the solid —
+     the one non-obvious gotcha, found via the Onshape UI). Verified live
+     (`scripts/smoke_counterbore.py`): counterbore → bore r=0.125 + cbore r=0.3; countersink →
+     bore + cone. Native holes regenerate with status `INFO` (an informational note), not `OK`.
+   - **Later:** tapped threads (the template already carries the tap params), two-distance chamfer,
+     and auto-picking `up` from the body's position relative to the sketch plane.
 6. **`cad_chamfer`** ✅ *shipped & verified* — equal-distance; `distance` accepts `#variable`.
    Two-distance / distance-angle still to add (the builder already carries the extra spec params).
 7. **Sketch on a face / offset plane.** ✅ *shipped & verified* — `cad_sketch_begin(face=<id>)`

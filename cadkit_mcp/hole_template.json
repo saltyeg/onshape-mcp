@@ -1,0 +1,1631 @@
+{
+"btType": "BTMFeature-134",
+"namespace": "",
+"name": "#featureName",
+"suppressed": false,
+"parameters": [
+{
+"btType": "BTMParameterBoolean-144",
+"value": true,
+"parameterId": "isV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleVersion",
+"value": "V3",
+"parameterId": "holeVersion",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQueryList-148",
+"queries": [],
+"filter": {
+"btType": "BTOrFilter-167",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTEntityTypeFilter-124",
+"entityType": "VERTEX"
+},
+"operand2": {
+"btType": "BTSketchObjectFilter-184",
+"isSketchObject": true,
+"objectType": "ANY_SKETCH_OBJECT"
+}
+},
+"operand2": {
+"btType": "BTModifiableEntityOnlyFilter-1593",
+"modifiableOnly": true
+}
+},
+"operand2": {
+"btType": "BTBodyTypeFilter-112",
+"bodyType": "MATE_CONNECTOR"
+}
+},
+"parameterId": "initEntities",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterString-149",
+"value": "\u00d8 #holeDiameterV3 \u21a7 #holeDepthV3 | \u2334\u00d8 #cBoreDiameterV3 \u21a7 #cBoreDepthV3",
+"parameterId": "featureName",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ThreadStandard",
+"value": "UNSET",
+"parameterId": "threadStandard",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "hasClearance",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "UnitsSystem",
+"value": "METRIC",
+"parameterId": "unitsSystem",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleStyle",
+"value": "C_BORE",
+"parameterId": "styleV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleStyle",
+"value": "C_BORE",
+"parameterId": "style",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQueryList-148",
+"queries": [],
+"filter": {
+"btType": "BTOrFilter-167",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTEntityTypeFilter-124",
+"entityType": "VERTEX"
+},
+"operand2": {
+"btType": "BTSketchObjectFilter-184",
+"isSketchObject": true,
+"objectType": "ANY_SKETCH_OBJECT"
+}
+},
+"operand2": {
+"btType": "BTModifiableEntityOnlyFilter-1593",
+"modifiableOnly": true
+}
+},
+"operand2": {
+"btType": "BTBodyTypeFilter-112",
+"bodyType": "MATE_CONNECTOR"
+}
+},
+"parameterId": "locations",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQueryList-148",
+"queries": [],
+"filter": null,
+"parameterId": "scope",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"size": "1/4 (0.25)",
+"holeType": "Drilled"
+},
+"parameterId": "ansiHoleTableEx",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"size": "1/4 (0.25)",
+"holeType": "Drilled"
+},
+"parameterId": "ansiHoleTable",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"size": "4",
+"holeType": "Drilled"
+},
+"parameterId": "isoHoleTableEx",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"size": "4.7",
+"holeType": "Drilled"
+},
+"parameterId": "isoHoleTable",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "showThreadClassV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"class": "2B"
+},
+"parameterId": "ansiThreadClassV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"class": "6H"
+},
+"parameterId": "isoThreadClassV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "showTappedDepth",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "holeDiameterV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "tapDrillDiameterV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "holeDiameterV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "holeDiameterV2Precision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceTypeExtended",
+"value": "NONE",
+"parameterId": "holeDiameterV2ToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterV2ToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterV2ToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterV2ToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterV2ToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterV2ToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"fit": "User defined",
+"standard": "ISO",
+"shaftClass": "None",
+"holeClass": "A9"
+},
+"parameterId": "holeDiameterV2FitToleranceTable",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterV2holeClassToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterV2holeClassToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "tapDrillDiameterV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "tapDrillDiameterV2Precision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "tapDrillDiameterV2ToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterV2ToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterV2ToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tapDrillDiameterV2ToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterV2ToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tapDrillDiameterV2ToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleStartStyle",
+"value": "PART",
+"parameterId": "startStyle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQueryList-148",
+"queries": [],
+"filter": {
+"btType": "BTOrFilter-167",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTEntityTypeFilter-124",
+"entityType": "FACE"
+},
+"operand2": {
+"btType": "BTGeometryFilter-130",
+"geometryType": "PLANE"
+}
+},
+"operand2": {
+"btType": "BTBodyTypeFilter-112",
+"bodyType": "MATE_CONNECTOR"
+}
+},
+"parameterId": "startBoundEntity",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleEndStyleV2",
+"value": "BLIND",
+"parameterId": "endStyleV2",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "HoleEndStyle",
+"value": "BLIND",
+"parameterId": "endStyle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "oppositeDirection",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQueryList-148",
+"queries": [],
+"filter": {
+"btType": "BTOrFilter-167",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTAndFilter-110",
+"operand1": {
+"btType": "BTEntityTypeFilter-124",
+"entityType": "FACE"
+},
+"operand2": {
+"btType": "BTSketchObjectFilter-184",
+"isSketchObject": false,
+"objectType": "NOT_SKETCH_OBJECT"
+}
+},
+"operand2": {
+"btType": "BTAllowMeshGeometryFilter-1026",
+"allowsMeshGeometry": true
+}
+},
+"operand2": {
+"btType": "BTOrFilter-167",
+"operand1": {
+"btType": "BTEntityTypeFilter-124",
+"entityType": "VERTEX"
+},
+"operand2": {
+"btType": "BTMateConnectorFilter-163",
+"requiresOccurrence": false,
+"allowImplicitMateConnector": false,
+"isMateConnectorInferenceEnabledByDefault": false
+}
+}
+},
+"parameterId": "endBoundEntity",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "offset",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.25 in",
+"parameterId": "offsetDistance",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "oppositeOffsetDirection",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"standard": "Custom"
+},
+"parameterId": "standardTappedOrClearance",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"standard": "Custom"
+},
+"parameterId": "standardBlindInLast",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "showThreadClass",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"class": "2B"
+},
+"parameterId": "ansiThreadClass",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"class": "6H"
+},
+"parameterId": "isoThreadClass",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "holeDiameter",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "holeDiameterPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceTypeExtended",
+"value": "NONE",
+"parameterId": "holeDiameterToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterLookupTablePath-1419",
+"value": {
+"fit": "User defined",
+"standard": "ISO",
+"shaftClass": "None",
+"holeClass": "A9"
+},
+"parameterId": "holeDiameterFitToleranceTable",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDiameterholeClassToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDiameterholeClassToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "cBoreDiameterV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.25 in",
+"parameterId": "cBoreDepthV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "cBoreDiameter",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "cBoreDiameterPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "cBoreDiameterToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDiameterToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDiameterToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cBoreDiameterToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDiameterToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cBoreDiameterToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.25 in",
+"parameterId": "cBoreDepth",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "cBoreDepthPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "cBoreDepthToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDepthToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDepthToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cBoreDepthToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cBoreDepthToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cBoreDepthToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "cSinkDiameterV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "90 degree",
+"parameterId": "cSinkAngleV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "cSinkDiameter",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "cSinkDiameterPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "cSinkDiameterToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cSinkDiameterToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cSinkDiameterToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cSinkDiameterToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "cSinkDiameterToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "cSinkDiameterToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "90 degree",
+"parameterId": "cSinkAngle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "cSinkAnglePrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "cSinkAngleToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "cSinkAngleToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "cSinkAngleToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-1 deg",
+"parameterId": "cSinkAngleToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "cSinkAngleToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-1 deg",
+"parameterId": "cSinkAngleToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "4.7 mm",
+"parameterId": "tapDrillDiameter",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "tapDrillDiameterPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "tapDrillDiameterToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tapDrillDiameterToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tapDrillDiameterToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tapDrillDiameterToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.25 in",
+"parameterId": "majorDiameter",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": false,
+"parameterId": "isMultiple",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterString-149",
+"value": "Multiple",
+"parameterId": "holeDepthMultiple",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "holeDepthMultiplePrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "holeDepthMultipleToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthMultipleToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthMultipleToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthMultipleToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthMultipleToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthMultipleToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "holeDepthComputedV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "holeDepthComputed",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "holeDepthComputedPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "holeDepthComputedToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthComputedToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthComputedToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthComputedToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthComputedToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthComputedToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "holeDepthV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "holeDepth",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "holeDepthPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "holeDepthToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "holeDepthToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "holeDepthToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "TipAngleStyle",
+"value": "DEGREE118",
+"parameterId": "tipAngleStyle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "118 deg",
+"parameterId": "tipAngleV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "118 deg",
+"parameterId": "tipAngle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "tipAnglePrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "tipAngleToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "tipAngleToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "tipAngleToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-1 deg",
+"parameterId": "tipAngleToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1 deg",
+"parameterId": "tipAngleToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-1 deg",
+"parameterId": "tipAngleToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterBoolean-144",
+"value": true,
+"parameterId": "isTappedThrough",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "tappedDepthV3",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.5 in",
+"parameterId": "tappedDepth",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "PrecisionType",
+"value": "DEFAULT",
+"parameterId": "tappedDepthPrecision",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterEnum-145",
+"namespace": "",
+"enumName": "ToleranceType",
+"value": "NONE",
+"parameterId": "tappedDepthToleranceType",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tappedDepthToleranceBoundSymmetrical",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tappedDepthToleranceBoundDeviationUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tappedDepthToleranceBoundDeviationLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.1 in",
+"parameterId": "tappedDepthToleranceBoundLimitsUpper",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "-0.1 in",
+"parameterId": "tappedDepthToleranceBoundLimitsLower",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "1.789911 deg",
+"parameterId": "tappedAngle",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "0.0",
+"parameterId": "tapClearance",
+"parameterName": "",
+"libraryRelationType": "NONE"
+},
+{
+"btType": "BTMParameterQuantity-147",
+"isInteger": false,
+"value": 0.0,
+"units": "",
+"expression": "{\"cBoreDepth\" : \"cBoreDepthV3\", \"cBoreDiameter\" : \"cBoreDiameterV3\", \"cSinkAngle\" : \"cSinkAngleV3\", \"cSinkDiameter\" : \"cSinkDiameterV3\", \"holeDepth\" : \"holeDepthV3\", \"holeDepthComputed\" : \"holeDepthComputedV3\", \"holeDiameter\" : \"holeDiameterV2\", \"holeDiameterV2\" : \"holeDiameterV3\", \"tapDrillDiameter\" : \"tapDrillDiameterV2\", \"tapDrillDiameterV2\" : \"tapDrillDiameterV3\", \"tappedDepth\" : \"tappedDepthV3\", \"tipAngle\" : \"tipAngleV3\"}",
+"parameterId": "toleranceMatching",
+"parameterName": "",
+"libraryRelationType": "NONE"
+}
+],
+"featureType": "hole",
+"returnAfterSubfeatures": false,
+"subFeatures": [],
+"suppressionState": null,
+"parameterLibraries": []
+}
