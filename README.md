@@ -32,17 +32,17 @@ A few hard-won principles are baked into the tools (the full list is in [PLAN.md
   chosen by geometry (concave edges for fillets, a cylindrical face by radius), so a feature
   keeps referring to the right thing after the model changes.
 
-## The cadkit tools (27)
+## The cadkit tools (28)
 
 | Group | Tools |
 |---|---|
 | **Document / studio** | `cad_document_create`, `cad_part_studio_create` |
-| **Sketch session** | `cad_sketch_begin` → `cad_sketch_line` · `cad_sketch_circle` · `cad_sketch_rectangle` · `cad_sketch_polyline` → `cad_sketch_constrain` · `cad_sketch_dimension` → `cad_sketch_close` |
+| **Sketch session** | `cad_sketch_begin` → `cad_sketch_line` · `cad_sketch_circle` · `cad_sketch_rectangle` · `cad_sketch_polyline` · `cad_sketch_slot` → `cad_sketch_constrain` · `cad_sketch_dimension` → `cad_sketch_close` |
 | **Variables** | `cad_set_variable` (update-or-create; no duplicates), `cad_get_variables` |
 | **Features** | `cad_extrude`, `cad_revolve`, `cad_fillet`, `cad_chamfer`, `cad_shell`, `cad_hole` (simple / counterbore / countersink) |
 | **Pattern / mirror** | `cad_mirror`, `cad_pattern` (linear + circular) — *feature-based*: repeat whole features, not faces |
 | **Inspection / lifecycle / I/O** | `cad_measure` (count/volume/bbox in one eval), `cad_delete_feature`, `cad_suppress`, `cad_edit_feature`, `cad_export` (STL/STEP/…) |
-| **Semantic selection** | `cad_find_edges` (circular / concave / linear), `cad_find_faces` (planar-by-normal / cylindrical) |
+| **Semantic selection** | `cad_find_edges` (circular / concave / linear / extreme), `cad_find_faces` (planar-by-normal / cylindrical / largest / smallest / extreme) |
 
 A sketch is one session: `cad_sketch_begin(plane=… | face=<id>)`, add entities, add geometric
 constraints + driving dimensions, then `cad_sketch_close`. `cad_pattern` / `cad_mirror` take the
@@ -132,7 +132,7 @@ venv/bin/python -m pytest tests/test_cadkit_builders.py -o addopts="" -q
 
 ```
 cadkit_mcp/
-├── server.py     # the 21 cadkit tools + feature JSON builders
+├── server.py     # the cadkit tools + feature JSON builders
 ├── sketch.py     # SketchSession: entities, constraints, grounding, diagnostics
 ├── selection.py  # semantic edge/face finders (FeatureScript-backed)
 └── devkit.py     # quota-frugal live verification helpers

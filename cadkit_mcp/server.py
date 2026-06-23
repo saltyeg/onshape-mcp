@@ -362,12 +362,17 @@ async def list_tools() -> List[Tool]:
         Tool(name="cad_sketch_line", description="Add a line; returns its entityId (points are <id>.start / <id>.end).",
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "start": pt, "end": pt,
                           "construction": {"type": "boolean"}}, "required": ["sessionId", "start", "end"]}),
-        Tool(name="cad_sketch_circle", description="Add a circle; returns entityId.",
+        Tool(name="cad_sketch_circle", description="Add a circle; returns entityId. construction=true for a reference circle.",
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "center": pt,
-                          "radius": {"type": "number"}}, "required": ["sessionId", "center", "radius"]}),
+                          "radius": {"type": "number"}, "construction": {"type": "boolean"}},
+                          "required": ["sessionId", "center", "radius"]}),
         Tool(name="cad_sketch_rectangle", description="Add a constrained rectangle; returns {bottom,right,top,left} line ids.",
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "corner1": pt, "corner2": pt},
                           "required": ["sessionId", "corner1", "corner2"]}),
+        Tool(name="cad_sketch_slot", description="Add an obround (rounded slot) between two centre points, given width — "
+             "a rectangle + a circle at each end; extruding unions them into a clean slot. Returns {sides, caps} ids.",
+             inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "center1": pt, "center2": pt,
+                          "width": {"type": "number"}}, "required": ["sessionId", "center1", "center2", "width"]}),
         Tool(name="cad_sketch_polyline", description="Add a chain of lines through points. Auto coincident-joins them; "
              "closed=True closes the loop; auto_hv applies horizontal/vertical to axis-aligned segments; "
              "ground_first grounds the first point to the origin if it is at (0,0). Returns the line ids.",
@@ -523,7 +528,7 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             return _txt(json.dumps({"sessionId": sid}))
 
         if name in ("cad_sketch_line","cad_sketch_circle","cad_sketch_rectangle","cad_sketch_polyline",
-                    "cad_sketch_constrain","cad_sketch_dimension","cad_sketch_close"):
+                    "cad_sketch_slot","cad_sketch_constrain","cad_sketch_dimension","cad_sketch_close"):
             s = SESSIONS.get(a.get("sessionId"))
             if not s:
                 return _txt(f"ERROR: unknown sessionId {a.get('sessionId')}")
@@ -533,6 +538,8 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 return _txt(json.dumps({"entityId": s.add_circle(a["center"], a["radius"], a.get("construction", False))}))
             if name == "cad_sketch_rectangle":
                 return _txt(json.dumps(s.add_rectangle(a["corner1"], a["corner2"])))
+            if name == "cad_sketch_slot":
+                return _txt(json.dumps(s.add_slot(a["center1"], a["center2"], a["width"])))
             if name == "cad_sketch_polyline":
                 pts = a["points"]; closed = a.get("closed", True); auto_hv = a.get("auto_hv", True)
                 ground_first = a.get("ground_first", True)

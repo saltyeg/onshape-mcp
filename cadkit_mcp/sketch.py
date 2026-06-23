@@ -95,6 +95,23 @@ class SketchSession:
                               "x": px * IN, "y": py * IN, "isConstruction": construction})
         return pid
 
+    def add_slot(self, center1: Tuple[float, float], center2: Tuple[float, float], width: float):
+        """An obround (rounded slot) between two centre points: a rotated rectangle plus a circle
+        at each end. Extruding the combined regions unions them into a clean slot — robust, built
+        from proven primitives (no fragile arc/tangency math). Returns the entity ids."""
+        (x1, y1), (x2, y2) = center1, center2
+        r = width / 2.0
+        th = math.atan2(y2 - y1, x2 - x1)
+        px, py = -math.sin(th) * r, math.cos(th) * r      # perpendicular offset, length r
+        a1 = (x1 + px, y1 + py); a2 = (x2 + px, y2 + py)
+        b2 = (x2 - px, y2 - py); b1 = (x1 - px, y1 - py)
+        sides = [self.add_line(a1, a2), self.add_line(a2, b2),
+                 self.add_line(b2, b1), self.add_line(b1, a1)]
+        for i in range(4):
+            self.coincident(f"{sides[i]}.end", f"{sides[(i + 1) % 4]}.start")
+        caps = [self.add_circle(center1, r), self.add_circle(center2, r)]
+        return {"sides": sides, "caps": caps}
+
     def add_rectangle(self, corner1, corner2):
         """Convenience: 4 lines + a full geometric-constraint set (origin NOT grounded)."""
         x1, y1 = corner1; x2, y2 = corner2

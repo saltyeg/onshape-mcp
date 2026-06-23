@@ -10,13 +10,13 @@ This roadmap is ordered so that **correctness and robustness of the parametric c
 before feature breadth** — a wide tool that emits under-defined or non-parametric geometry
 would betray the thesis. Reorder freely; the tiers are a recommendation, not a contract.
 
-## Current state (27 tools — P0–P2 shipped)
+## Current state (28 tools — P0–P2 shipped, P3 in progress)
 - Document/part-studio: `cad_document_create`, `cad_part_studio_create`
-- Sketch session: `cad_sketch_begin` → `line`/`circle`/`rectangle`/`polyline` → `constrain`/`dimension` → `close`
+- Sketch session: `cad_sketch_begin` → `line`/`circle`/`rectangle`/`polyline`/`slot` → `constrain`/`dimension` → `close`
 - Variables: `cad_set_variable`, `cad_get_variables`
-- Features: `cad_extrude`, `cad_fillet`, `cad_chamfer`, `cad_shell`, `cad_hole`, `cad_revolve`, `cad_mirror`, `cad_pattern`
+- Features: `cad_extrude`, `cad_fillet`, `cad_chamfer`, `cad_shell`, `cad_hole` (simple/counterbore/countersink), `cad_revolve`, `cad_mirror`, `cad_pattern`
 - Inspection / lifecycle / I/O: `cad_measure`, `cad_delete_feature`, `cad_suppress`, `cad_edit_feature`, `cad_export`
-- Semantic selection: `cad_find_edges` (circular/concave/convex/linear), `cad_find_faces` (planar-by-normal/cylindrical)
+- Semantic selection: `cad_find_edges` (circular/concave/convex/linear/extreme), `cad_find_faces` (planar-by-normal/cylindrical/largest/smallest/extreme)
 - Dev tooling: `cadkit_mcp/devkit.py` (quota-frugal verification helpers); on-demand live smokes in `scripts/`
 
 Verified working: variable-driven dimensions drive the solid (a sketch drawn at the wrong
@@ -125,10 +125,14 @@ bugs the per-tool smokes could not:
 
 ## P3 — Selection & ergonomics
 
-14. **Richer semantic selection** — largest/smallest face by area, faces/edges by position
-    (highest Z, on a given plane), by adjacency, by tag. Reduce reliance on raw normals.
-15. **Sketch ergonomics** — slots, arcs/fillets *within* a sketch, construction geometry,
-    in-sketch mirror/pattern, auto-dimension-to-fully-defined helper.
+14. **Richer semantic selection** — ✅ *largest/smallest face by area, faces/edges by extreme
+    position* (`cad_find_faces` kind=largest/smallest/extreme, `cad_find_edges` kind=extreme —
+    axis+max, e.g. "the top face", "all bottom edges"). Still TODO: by adjacency, by tag, on-a-given
+    plane. (FS gotcha: divide out units before comparing — see [[onshape-feature-errors]] sibling note.)
+15. **Sketch ergonomics** — ✅ *slot* (`cad_sketch_slot`: obround = rectangle + a circle each end,
+    extrude-unions to one clean solid — verified 2.6×0.6) and ✅ *construction geometry* exposed on
+    line + circle. Still TODO: arcs/fillets *within* a sketch, in-sketch mirror/pattern,
+    auto-dimension-to-fully-defined helper.
 
 ---
 

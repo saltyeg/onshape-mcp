@@ -69,6 +69,19 @@ def test_selection_finders_strip_units_and_target_axis():
     assert "minCorner[0]" in edge_x_min and "<" in edge_x_min  # min picks the lower extreme
 
 
+def test_add_slot_emits_rect_plus_two_caps():
+    s = _session()
+    out = s.add_slot((0, 0), (2, 0), 0.6)
+    assert len(out["sides"]) == 4 and len(out["caps"]) == 2     # 4 rect lines + a circle each end
+    # the cap circles sit at the two centres, radius = width/2
+    cap_centers = []
+    for e in s.entities:
+        if e["btType"].startswith("BTMSketchCurveSegment") and e["entityId"].endswith(".a"):
+            g = e["geometry"]
+            cap_centers.append((round(g["xCenter"] / 0.0254, 3), round(g["radius"] / 0.0254, 3)))
+    assert (0.0, 0.3) in cap_centers and (2.0, 0.3) in cap_centers
+
+
 def test_add_point_emits_sketch_point_in_meters():
     s = _session()
     pid = s.add_point((1.0, 0.5))
