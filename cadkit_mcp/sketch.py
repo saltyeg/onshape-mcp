@@ -209,6 +209,30 @@ class SketchSession:
             self._str(line, "localSecond"),
             {"btType": "BTMParameterQuantity-147", "expression": _expr(value), "parameterId": "length"}]))
 
+    # ---- diagnostics -------------------------------------------------------
+    _DIM_TYPES = {"LENGTH", "DISTANCE", "RADIUS", "DIAMETER", "ANGLE"}
+
+    def diagnostics(self) -> Dict[str, Any]:
+        """Cheap, local under-definition signals (no API call).
+
+        True 0-DOF detection isn't exposed by the API, but the two failure modes that make a
+        sketch wildly under-defined — not grounded, or carrying no driving dimensions — are
+        detectable from the constraints we emit. `wellFormed` is False when either is missing.
+        """
+        dims = sum(1 for c in self.constraints if c.get("constraintType") in self._DIM_TYPES)
+        grounded = False
+        for c in self.constraints:
+            if c.get("constraintType") == "FIX":
+                grounded = True
+            elif c.get("constraintType") == "COINCIDENT":
+                for p in c.get("parameters", []):
+                    if p.get("btType", "").startswith("BTMParameterQueryList"):
+                        for qy in p.get("queries", []):
+                            if ORIGIN_VERTEX in qy.get("deterministicIds", []):
+                                grounded = True
+        return {"entities": len(self.entities), "dimensions": dims,
+                "grounded": grounded, "wellFormed": grounded and dims > 0}
+
     # ---- emit --------------------------------------------------------------
     def build(self) -> Dict[str, Any]:
         return {"feature": {

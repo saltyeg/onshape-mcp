@@ -15,7 +15,6 @@ from onshape_mcp.api.client import OnshapeClient, OnshapeCredentials
 from onshape_mcp.api.partstudio import PartStudioManager
 from onshape_mcp.api.featurescript import FeatureScriptManager
 from onshape_mcp.api.documents import DocumentManager
-from onshape_mcp.builders.fillet import FilletBuilder
 
 from .sketch import SketchSession, PLANES
 from . import selection as sel
@@ -44,6 +43,35 @@ FS = FeatureScriptManager(client)
 DOCS = DocumentManager(client)
 
 SESSIONS: Dict[str, SketchSession] = {}
+# (doc, ws, elem) -> {variable name: featureId}. Lets cad_set_variable update an existing
+# Variable feature in place instead of appending a duplicate. Populated lazily with one
+# get_features read per element, then kept warm so repeated sets cost only the write.
+_VAR_CACHE: Dict[tuple, Dict[str, str]] = {}
+
+
+async def _set_variable(doc: str, ws: str, elem: str, name: str, expression: str) -> Dict[str, Any]:
+    key = (doc, ws, elem)
+    if key not in _VAR_CACHE:
+        existing: Dict[str, str] = {}
+        feats = await PS.get_features(doc, ws, elem)
+        for f in feats.get("features", []):
+            if f.get("featureType") == "assignVariable":
+                vn = next((p.get("value") for p in f.get("parameters", [])
+                           if p.get("parameterId") == "name"), None)
+                if vn:
+                    existing[vn] = f.get("featureId")
+        _VAR_CACHE[key] = existing
+    cache = _VAR_CACHE[key]
+    if name in cache:
+        fid = cache[name]
+        r = await PS.update_feature(doc, ws, elem, fid, _assign_variable_json(name, expression, fid))
+        action = "updated"
+    else:
+        r = await PS.add_feature(doc, ws, elem, _assign_variable_json(name, expression))
+        fid = r["feature"]["featureId"]
+        cache[name] = fid
+        action = "created"
+    return {"status": r.get("featureState", {}).get("featureStatus"), "action": action, "featureId": fid}
 _counter = {"n": 0}
 
 def _new_session_id() -> str:
@@ -53,7 +81,15 @@ def _new_session_id() -> str:
 def _txt(s: str) -> List[TextContent]:
     return [TextContent(type="text", text=s)]
 
-def _extrude_json(sketch_fid: str, depth_in: float, op: str, name: str) -> Dict[str, Any]:
+def _scalar_expr(value, unit: str = "in") -> str:
+    """A scalar parameter as an Onshape expression: a number (in `unit`) or a raw
+    expression / #variable passed through (e.g. 1.5 -> '1.5 in'; '#width' -> '#width')."""
+    if isinstance(value, (int, float)):
+        return f"{value} {unit}"
+    return str(value)
+
+
+def _extrude_json(sketch_fid: str, depth, op: str, name: str) -> Dict[str, Any]:
     return {"btType": "BTFeatureDefinitionCall-1406", "feature": {
         "btType": "BTMFeature-134", "featureType": "extrude", "name": name,
         "suppressed": False, "namespace": "", "parameters": [
@@ -66,24 +102,37 @@ def _extrude_json(sketch_fid: str, depth_in: float, op: str, name: str) -> Dict[
              "value": op, "parameterId": "operationType"},
             {"btType": "BTMParameterEnum-145", "enumName": "BoundingType",
              "value": "BLIND", "parameterId": "endBound"},
-            {"btType": "BTMParameterQuantity-147", "expression": f"{depth_in} in",
+            {"btType": "BTMParameterQuantity-147", "expression": _scalar_expr(depth),
              "parameterId": "depth", "isInteger": False}]}}
 
-def _assign_variable_json(name: str, expression: str) -> Dict[str, Any]:
+def _assign_variable_json(name: str, expression: str, feature_id: Optional[str] = None) -> Dict[str, Any]:
     # The assignVariable ("Variable") feature stores its value in a TYPE-SPECIFIC
     # parameter — anyValue/lengthValue/angleValue/numberValue — gated by variableType.
     # The plain "value" parameter is AlwaysHidden/legacy and silently fails to evaluate
     # ("Cannot evaluate the variable", resolves to 0). We use variableType=ANY +
     # anyValue, which accepts any expression ("2 in", "0.25 in", "#other*2", numbers).
     # Verified OK against the live API featurespecs for the Variable feature.
-    return {"feature": {"btType": "BTMFeature-134", "featureType": "assignVariable",
+    feature = {"btType": "BTMFeature-134", "featureType": "assignVariable",
         "name": name, "suppressed": False, "namespace": "",
         "parameters": [
             {"btType": "BTMParameterEnum-145", "enumName": "VariableType",
              "value": "ANY", "parameterId": "variableType"},
             {"btType": "BTMParameterString-149", "value": name, "parameterId": "name"},
             {"btType": "BTMParameterQuantity-147", "isInteger": False,
-             "expression": expression, "parameterId": "anyValue"}]}}
+             "expression": expression, "parameterId": "anyValue"}]}
+    if feature_id is not None:
+        feature["featureId"] = feature_id          # required when updating in place
+    return {"feature": feature}
+
+
+def _fillet_json(edge_ids, radius, name: str) -> Dict[str, Any]:
+    """Constant-radius fillet whose radius accepts a number or an expression/#variable."""
+    return {"feature": {"btType": "BTMFeature-134", "featureType": "fillet",
+        "name": name, "suppressed": False, "namespace": "", "parameters": [
+            {"btType": "BTMParameterQueryList-148", "parameterId": "entities",
+             "queries": [{"btType": "BTMIndividualQuery-138", "deterministicIds": list(edge_ids)}]},
+            {"btType": "BTMParameterQuantity-147", "isInteger": False,
+             "expression": _scalar_expr(radius), "parameterId": "radius"}]}}
 
 # --------------------------------------------------------------------------
 server = Server("cadkit")
@@ -132,18 +181,24 @@ async def list_tools() -> List[Tool]:
                           "kind": {"type": "string", "enum": ["length", "radius", "diameter", "distance", "angle"]},
                           "entity": {"type": "string"}, "entity2": {"type": "string"}, "value": {}},
                           "required": ["sessionId", "kind", "entity", "value"]}),
-        Tool(name="cad_sketch_close", description="Post the sketch as one feature; returns its featureId.",
-             inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}}, "required": ["sessionId"]}),
-        Tool(name="cad_set_variable", description="Create/assign a part-studio variable (assignVariable). expression e.g. '2.4 in'.",
+        Tool(name="cad_sketch_close", description="Post the sketch as one feature; returns its featureId plus diagnostics "
+             "(grounded, dimensions, wellFormed). Set require_well_formed=true to refuse (without posting) a sketch that "
+             "is ungrounded or has no driving dimensions.",
+             inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"},
+                          "require_well_formed": {"type": "boolean"}}, "required": ["sessionId"]}),
+        Tool(name="cad_set_variable", description="Set a part-studio variable (assignVariable), update-or-create: re-setting "
+             "the same name updates it in place instead of adding a duplicate. expression e.g. '2.4 in' or '#other*2'.",
              inputSchema={"type": "object", "properties": {**ds, "name": {"type": "string"}, "expression": {"type": "string"}},
                           "required": ["documentId", "workspaceId", "elementId", "name", "expression"]}),
-        Tool(name="cad_extrude", description="Extrude a sketch region. operation: NEW/ADD/REMOVE/INTERSECT.",
+        Tool(name="cad_extrude", description="Extrude a sketch region. operation: NEW/ADD/REMOVE/INTERSECT. depth is inches "
+             "(number) or an expression/#variable.",
              inputSchema={"type": "object", "properties": {**ds, "sketchFeatureId": {"type": "string"},
-                          "depth": {"type": "number"}, "operation": {"type": "string", "enum": ["NEW","ADD","REMOVE","INTERSECT"]},
+                          "depth": {"type": ["number", "string"]}, "operation": {"type": "string", "enum": ["NEW","ADD","REMOVE","INTERSECT"]},
                           "name": {"type": "string"}}, "required": ["documentId","workspaceId","elementId","sketchFeatureId","depth"]}),
-        Tool(name="cad_fillet", description="Fillet edges (deterministic ids from cad_find_edges).",
+        Tool(name="cad_fillet", description="Fillet edges (deterministic ids from cad_find_edges). radius is inches (number) "
+             "or an expression/#variable.",
              inputSchema={"type": "object", "properties": {**ds, "edgeIds": {"type": "array", "items": {"type": "string"}},
-                          "radius": {"type": "number"}, "name": {"type": "string"}},
+                          "radius": {"type": ["number", "string"]}, "name": {"type": "string"}},
                           "required": ["documentId","workspaceId","elementId","edgeIds","radius"]}),
         Tool(name="cad_find_edges", description="Find edges by geometry. kind: circular (radius+tol), concave (inner "
              "corners, ideal for fillets), linear (axis X/Y/Z and/or through point). Returns deterministic ids.",
@@ -223,15 +278,29 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                  "angle": lambda: s.dim_angle(e, e2, v)}[k]()
                 return _txt("ok")
             if name == "cad_sketch_close":
+                diag = s.diagnostics()
+                if a.get("require_well_formed") and not diag["wellFormed"]:
+                    # fail BEFORE posting (also saves a call): say what's missing
+                    missing = []
+                    if not diag["grounded"]: missing.append("not grounded to origin")
+                    if diag["dimensions"] == 0: missing.append("no driving dimensions")
+                    return _txt(json.dumps({"error": "sketch under-defined: " + "; ".join(missing),
+                                            "diagnostics": diag}))
                 r = await PS.add_feature(s.doc, s.ws, s.elem, s.build())
                 fid = r["feature"]["featureId"]; st = r.get("featureState", {}).get("featureStatus")
                 del SESSIONS[a["sessionId"]]
-                return _txt(json.dumps({"sketchFeatureId": fid, "status": st}))
+                out = {"sketchFeatureId": fid, "status": st, **diag}
+                if not diag["wellFormed"]:
+                    out["warning"] = ("likely under-defined ("
+                                      + ("ungrounded" if not diag["grounded"] else "")
+                                      + (" " if not diag["grounded"] and diag["dimensions"] == 0 else "")
+                                      + ("no dimensions" if diag["dimensions"] == 0 else "") + ")")
+                return _txt(json.dumps(out))
 
         if name == "cad_set_variable":
-            r = await PS.add_feature(a["documentId"], a["workspaceId"], a["elementId"],
-                                     _assign_variable_json(a["name"], a["expression"]))
-            return _txt(json.dumps({"status": r.get("featureState", {}).get("featureStatus")}))
+            r = await _set_variable(a["documentId"], a["workspaceId"], a["elementId"],
+                                    a["name"], a["expression"])
+            return _txt(json.dumps(r))
 
         if name == "cad_extrude":
             r = await PS.add_feature(a["documentId"], a["workspaceId"], a["elementId"],
@@ -239,9 +308,8 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             return _txt(json.dumps({"status": r.get("featureState", {}).get("featureStatus")}))
 
         if name == "cad_fillet":
-            fb = FilletBuilder(a.get("name", "Fillet"), a["radius"])
-            for e in a["edgeIds"]: fb.add_edge(e)
-            r = await PS.add_feature(a["documentId"], a["workspaceId"], a["elementId"], fb.build())
+            r = await PS.add_feature(a["documentId"], a["workspaceId"], a["elementId"],
+                _fillet_json(a["edgeIds"], a["radius"], a.get("name", "Fillet")))
             return _txt(json.dumps({"status": r.get("featureState", {}).get("featureStatus")}))
 
         if name == "cad_find_edges":
