@@ -70,11 +70,20 @@ def _extrude_json(sketch_fid: str, depth_in: float, op: str, name: str) -> Dict[
              "parameterId": "depth", "isInteger": False}]}}
 
 def _assign_variable_json(name: str, expression: str) -> Dict[str, Any]:
+    # The assignVariable ("Variable") feature stores its value in a TYPE-SPECIFIC
+    # parameter — anyValue/lengthValue/angleValue/numberValue — gated by variableType.
+    # The plain "value" parameter is AlwaysHidden/legacy and silently fails to evaluate
+    # ("Cannot evaluate the variable", resolves to 0). We use variableType=ANY +
+    # anyValue, which accepts any expression ("2 in", "0.25 in", "#other*2", numbers).
+    # Verified OK against the live API featurespecs for the Variable feature.
     return {"feature": {"btType": "BTMFeature-134", "featureType": "assignVariable",
         "name": name, "suppressed": False, "namespace": "",
-        "parameters": [{"btType": "BTMParameterString-149", "value": name, "parameterId": "name"},
-                       {"btType": "BTMParameterQuantity-147", "isInteger": False,
-                        "expression": expression, "parameterId": "value"}]}}
+        "parameters": [
+            {"btType": "BTMParameterEnum-145", "enumName": "VariableType",
+             "value": "ANY", "parameterId": "variableType"},
+            {"btType": "BTMParameterString-149", "value": name, "parameterId": "name"},
+            {"btType": "BTMParameterQuantity-147", "isInteger": False,
+             "expression": expression, "parameterId": "anyValue"}]}}
 
 # --------------------------------------------------------------------------
 server = Server("cadkit")
