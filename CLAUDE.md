@@ -2,7 +2,7 @@
 
 ## Project Conventions
 
-- **PRs target `develop`**, never `main`. `main` is only for releases.
+- **PRs target `main`.** `main` is the mainline branch.
 - Tests: `pytest` (all tests must pass). Coverage: `pytest --cov`.
 - Style: `ruff check` and `ruff format --check`.
 
@@ -23,7 +23,6 @@ See `knowledge_base/assembly_workflow_guide.md` for the full guide and `examples
 - **Instance order = direction**: For slider/revolute/cylindrical mates, the first instance moves relative to the second. Swap the order to reverse the direction.
 - **Limits can break the solver**: API-set limits trigger a full re-solve that may flip parts. Create mates without limits first, add limits in the Onshape UI.
 - **Fixed instances can't be moved**: `transform_instance` and `set_instance_position` fail on grounded parts (API 400 error).
-- **Absolute positions need reference offset**: If the reference part is at (100, 200, 300), a part at relative (5, 10, 0) needs absolute (105, 210, 300).
 - **MC offsets are in local coords**: Flipping the Z-axis changes all axes (right-hand rule), which changes how X/Y offsets map to world space.
 
 ## Key File Paths
