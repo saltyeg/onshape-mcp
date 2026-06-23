@@ -111,6 +111,66 @@ def fs_cylindrical_faces(radius_in: Optional[float], tol_in: float = 0.001) -> s
 }}"""
 
 
+# ---- richer selection: by area / by position (reduce reliance on raw normals) ---------
+_AXIS_IDX = {"X": 0, "Y": 1, "Z": 2}
+
+
+def fs_faces_by_area(want_largest: bool = True) -> str:
+    """The single largest (or smallest) face by area — e.g. 'the big flat face to sketch on'."""
+    cmp = ">" if want_largest else "<"
+    init = "-1.0" if want_largest else "1e18"
+    # strip units before comparing — FeatureScript throws on length/area-vs-plain-number compares
+    return f"""function(context is Context, queries){{
+  var best; var bestA = {init};
+  for (var f in evaluateQuery(context, {SOLID_FACES})){{
+    var a = evArea(context, {{"entities": f}}) / (inch * inch);
+    if (a {cmp} bestA){{ bestA = a; best = f; }}
+  }}
+  if (best == undefined){{ return []; }}
+  return transientQueriesToStrings(best);
+}}"""
+
+
+def fs_extreme_faces(axis: str, want_max: bool = True) -> str:
+    """The face whose centre sits furthest along +axis (max) or -axis (min) — e.g. the top face."""
+    i = _AXIS_IDX[axis]
+    cmp = ">" if want_max else "<"
+    init = "-1e18" if want_max else "1e18"
+    return f"""function(context is Context, queries){{
+  var best; var bestV = {init};
+  for (var f in evaluateQuery(context, {SOLID_FACES})){{
+    var b = evBox3d(context, {{"topology": f}});
+    var v = (b.minCorner[{i}] + b.maxCorner[{i}]) / 2 / inch;
+    if (v {cmp} bestV){{ bestV = v; best = f; }}
+  }}
+  if (best == undefined){{ return []; }}
+  return transientQueriesToStrings(best);
+}}"""
+
+
+def fs_extreme_edges(axis: str, want_max: bool = True, tol_in: float = 0.01) -> str:
+    """ALL edges at the extreme position along an axis — e.g. every top edge, to fillet at once."""
+    i = _AXIS_IDX[axis]
+    cmp = ">" if want_max else "<"
+    init = "-1e18" if want_max else "1e18"
+    return f"""function(context is Context, queries){{
+  var edges = evaluateQuery(context, {SOLID_EDGES});
+  var bestV = {init};
+  for (var e in edges){{
+    var b = evBox3d(context, {{"topology": e}});
+    var v = (b.minCorner[{i}] + b.maxCorner[{i}]) / 2 / inch;
+    if (v {cmp} bestV){{ bestV = v; }}
+  }}
+  var out = [];
+  for (var e in edges){{
+    var b = evBox3d(context, {{"topology": e}});
+    var v = (b.minCorner[{i}] + b.maxCorner[{i}]) / 2 / inch;
+    if (abs(v - bestV) < {tol_in}){{ out = append(out, transientQueriesToStrings(e)); }}
+  }}
+  return out;
+}}"""
+
+
 def fs_sketch_vertices(sketch_fid: str) -> str:
     """Deterministic ids of the point/vertex entities a sketch created — the native Hole
     feature's `locations` are sketch points."""

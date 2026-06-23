@@ -57,6 +57,18 @@ def test_native_hole_overrides_template_fields():
     assert p["scope"]["queries"][0]["deterministicIds"] == ["JHD"]
 
 
+def test_selection_finders_strip_units_and_target_axis():
+    # REGRESSION: FeatureScript throws on comparing a length/area (with units) to a plain number,
+    # so the finders must divide out units before the comparison.
+    from cadkit_mcp import selection as sl
+    area = sl.fs_faces_by_area(True)
+    assert "evArea" in area and "/ (inch * inch)" in area
+    face_z = sl.fs_extreme_faces("Z", want_max=True)
+    assert "minCorner[2]" in face_z and "/ inch" in face_z and ">" in face_z
+    edge_x_min = sl.fs_extreme_edges("X", want_max=False)
+    assert "minCorner[0]" in edge_x_min and "<" in edge_x_min  # min picks the lower extreme
+
+
 def test_add_point_emits_sketch_point_in_meters():
     s = _session()
     pid = s.add_point((1.0, 0.5))
