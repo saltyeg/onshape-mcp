@@ -235,6 +235,69 @@ class SketchSession:
                  self._str(axis_line, "local")]))
         return mapping
 
+    def _circle_def(self, cid: str):
+        """(center, radius) in inches for a circle id, read off its `.a` sub-arc; None if not a circle."""
+        a = next((x for x in self.entities if x.get("entityId") == f"{cid}.a"), None)
+        if a is None or not a["geometry"]["btType"].startswith("BTCurveGeometryCircle"):
+            return None
+        g = a["geometry"]
+        return (g["xCenter"] / IN, g["yCenter"] / IN), g["radius"] / IN
+
+    def add_pattern(self, entity_ids: List[str], kind: str, count: int, *,
+                    direction: Optional[Tuple[float, float]] = None, spacing: Optional[float] = None,
+                    center: Optional[Tuple[float, float]] = None,
+                    angle: Optional[float] = None) -> Dict[str, List[str]]:
+        """Repeat sketch lines/circles as geometric copies. Returns {originalId: [copyIds...]}.
+
+        linear: needs `direction` (a vector) + `spacing` (inches between instances).
+        circular: needs `center` + `angle` (DEGREES between instances).
+        `count` is the total instance count including the original (so count-1 copies are made).
+
+        These are GEOMETRIC copies at the right coordinates — NOT a live-linked sketch-pattern
+        construct (no pattern constraint, so editing the original doesn't ripple). That keeps it
+        pure offline-verifiable trig; a parametric sketch pattern would need the pattern construct
+        discovered spec-first. Lines + circles only (arcs are a follow-up)."""
+        if count < 2:
+            raise ValueError("pattern count must be >= 2")
+        if kind == "linear":
+            if direction is None or spacing is None:
+                raise ValueError("linear pattern needs direction and spacing")
+            dx, dy = direction
+            dl = math.hypot(dx, dy)
+            if dl == 0:
+                raise ValueError("pattern direction is degenerate")
+            ux, uy = dx / dl, dy / dl
+            def place(pt, k): return (pt[0] + ux * spacing * k, pt[1] + uy * spacing * k)
+        elif kind == "circular":
+            if center is None or angle is None:
+                raise ValueError("circular pattern needs center and angle (degrees between instances)")
+            cx, cy = center
+            def place(pt, k):
+                th = math.radians(angle * k)
+                x, y = pt[0] - cx, pt[1] - cy
+                return (cx + x * math.cos(th) - y * math.sin(th),
+                        cy + x * math.sin(th) + y * math.cos(th))
+        else:
+            raise ValueError(f"unknown pattern kind {kind!r} (use 'linear' or 'circular')")
+
+        mapping: Dict[str, List[str]] = {}
+        for eid in entity_ids:
+            copies: List[str] = []
+            cdef = self._circle_def(eid)
+            if cdef is not None:
+                ctr, r = cdef
+                for k in range(1, count):
+                    copies.append(self.add_circle(place(ctr, k), r))
+            else:
+                e = next((x for x in self.entities if x.get("entityId") == eid), None)
+                if e is None or not e["geometry"]["btType"].startswith("BTCurveGeometryLine"):
+                    raise ValueError(f"{eid} is not a patternable line or circle (lines/circles only for now)")
+                _, s, en = self._line_points(eid)
+                for k in range(1, count):
+                    copies.append(self.add_line(place(s, k), place(en, k)))
+            mapping[eid] = copies
+        return mapping
+
     def add_point(self, at: Tuple[float, float], construction: bool = False) -> str:
         """A standalone sketch point — used as a hole `locations` target (native Hole feature)."""
         px, py = at

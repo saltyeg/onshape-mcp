@@ -172,6 +172,45 @@ def test_adjacent_finder_is_structurally_a_qadjacent_face_sweep():
     assert "evBox3d" in fs and "transientQueriesToStrings" in fs
 
 
+def _circle_center(s, cid):
+    a = [e for e in s.entities if e.get("entityId") == f"{cid}.a"][0]
+    g = a["geometry"]
+    return g["xCenter"] / 0.0254, g["yCenter"] / 0.0254
+
+
+def test_linear_pattern_copies_circle_along_direction():
+    s = _session()
+    c = s.add_circle((0, 0), 0.25)
+    mapping = s.add_pattern([c], "linear", count=3, direction=[1, 0], spacing=1.0)
+    copies = mapping[c]
+    assert len(copies) == 2                       # count incl. original -> 2 copies
+    cx1, cy1 = _circle_center(s, copies[0]); cx2, cy2 = _circle_center(s, copies[1])
+    assert abs(cx1 - 1.0) < 1e-9 and abs(cy1) < 1e-9
+    assert abs(cx2 - 2.0) < 1e-9 and abs(cy2) < 1e-9
+
+
+def test_circular_pattern_rotates_circle_about_center():
+    import math
+    s = _session()
+    c = s.add_circle((1, 0), 0.1)
+    mapping = s.add_pattern([c], "circular", count=4, center=[0, 0], angle=90.0)
+    pts = [_circle_center(s, cp) for cp in mapping[c]]
+    assert len(pts) == 3
+    for (x, y), (ex, ey) in zip(pts, [(0, 1), (-1, 0), (0, -1)]):   # 90/180/270 deg
+        assert abs(x - ex) < 1e-9 and abs(y - ey) < 1e-9
+
+
+def test_pattern_rejects_bad_count_and_unpatternable_entity():
+    import pytest
+    s = _session()
+    c = s.add_circle((0, 0), 0.25)
+    with pytest.raises(ValueError):
+        s.add_pattern([c], "linear", count=1, direction=[1, 0], spacing=1.0)   # count < 2
+    arc = s.add_arc((2, 0), (3, 0), (2, 1))
+    with pytest.raises(ValueError):
+        s.add_pattern([arc], "linear", count=2, direction=[1, 0], spacing=1.0)  # arcs not yet
+
+
 # MIRROR constraint live-verified in scripts/smoke_sketch_mirror.py (half-diamond -> 2.0in^3 rhombus).
 def test_add_mirror_reflects_lines_across_axis_and_links_with_mirror_constraint():
     s = _session()

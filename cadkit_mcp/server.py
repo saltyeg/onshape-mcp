@@ -386,6 +386,16 @@ async def list_tools() -> List[Tool]:
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"},
                           "entityIds": {"type": "array", "items": {"type": "string"}}, "axis": {"type": "string"}},
                           "required": ["sessionId", "entityIds", "axis"]}),
+        Tool(name="cad_sketch_pattern", description="Repeat sketch lines/circles as geometric copies. kind=linear needs "
+             "direction=[dx,dy] + spacing (inches between instances); kind=circular needs center=[cx,cy] + angle (degrees "
+             "between instances). count is the total incl. the original. Copies are geometric (not a live-linked pattern). "
+             "Returns {originalId: [copyIds...]}.",
+             inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"},
+                          "entityIds": {"type": "array", "items": {"type": "string"}},
+                          "kind": {"type": "string", "enum": ["linear", "circular"]}, "count": {"type": "integer"},
+                          "direction": {"type": "array", "items": {"type": "number"}}, "spacing": {"type": "number"},
+                          "center": {"type": "array", "items": {"type": "number"}}, "angle": {"type": "number"}},
+                          "required": ["sessionId", "entityIds", "kind", "count"]}),
         Tool(name="cad_sketch_rectangle", description="Add a constrained rectangle; returns {bottom,right,top,left} line ids.",
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "corner1": pt, "corner2": pt},
                           "required": ["sessionId", "corner1", "corner2"]}),
@@ -554,8 +564,8 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             return _txt(json.dumps({"sessionId": sid}))
 
         if name in ("cad_sketch_line","cad_sketch_circle","cad_sketch_arc","cad_sketch_fillet","cad_sketch_mirror",
-                    "cad_sketch_rectangle","cad_sketch_polyline","cad_sketch_slot","cad_sketch_constrain",
-                    "cad_sketch_dimension","cad_sketch_close"):
+                    "cad_sketch_pattern","cad_sketch_rectangle","cad_sketch_polyline","cad_sketch_slot",
+                    "cad_sketch_constrain","cad_sketch_dimension","cad_sketch_close"):
             s = SESSIONS.get(a.get("sessionId"))
             if not s:
                 return _txt(f"ERROR: unknown sessionId {a.get('sessionId')}")
@@ -569,6 +579,10 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 return _txt(json.dumps(s.add_fillet(a["line1"], a["line2"], a["radius"])))
             if name == "cad_sketch_mirror":
                 return _txt(json.dumps(s.add_mirror(a["entityIds"], a["axis"])))
+            if name == "cad_sketch_pattern":
+                return _txt(json.dumps(s.add_pattern(a["entityIds"], a["kind"], a["count"],
+                            direction=a.get("direction"), spacing=a.get("spacing"),
+                            center=a.get("center"), angle=a.get("angle"))))
             if name == "cad_sketch_rectangle":
                 return _txt(json.dumps(s.add_rectangle(a["corner1"], a["corner2"])))
             if name == "cad_sketch_slot":
