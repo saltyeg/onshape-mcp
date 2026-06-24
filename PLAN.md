@@ -10,9 +10,9 @@ This roadmap is ordered so that **correctness and robustness of the parametric c
 before feature breadth** — a wide tool that emits under-defined or non-parametric geometry
 would betray the thesis. Reorder freely; the tiers are a recommendation, not a contract.
 
-## Current state (31 tools — P0–P2 shipped, P3 in progress)
+## Current state (32 tools — P0–P2 shipped, P3 in progress)
 - Document/part-studio: `cad_document_create`, `cad_part_studio_create`
-- Sketch session: `cad_sketch_begin` → `line`/`circle`/`arc`/`fillet`/`rectangle`/`polyline`/`slot` → `constrain`/`dimension` → `close`
+- Sketch session: `cad_sketch_begin` → `line`/`circle`/`arc`/`fillet`/`mirror`/`rectangle`/`polyline`/`slot` → `constrain`/`dimension` → `close`
 - Variables: `cad_set_variable`, `cad_get_variables`
 - Features: `cad_extrude`, `cad_fillet`, `cad_chamfer`, `cad_shell`, `cad_hole` (simple/counterbore/countersink), `cad_revolve`, `cad_mirror`, `cad_pattern`
 - Inspection / lifecycle / I/O: `cad_measure`, `cad_delete_feature`, `cad_suppress`, `cad_edit_feature`, `cad_export`
@@ -150,7 +150,12 @@ bugs the per-tool smokes could not:
     a 2×2 square filleted 0.5" on one corner extruded to one solid measuring 3.9463 in³ (sharp box
     = 4.0; the corner is genuinely rounded), arc/sketch/extrude all `OK`
     (`scripts/smoke_fillet_adjacency.py`, ~5 calls). Backed by builders + regression tests
-    (32 offline). Still TODO: in-sketch mirror/pattern, auto-dimension-to-fully-defined helper.
+    (35 offline). ✅ *in-sketch mirror* (`cad_sketch_mirror`: reflects sketch lines across an axis
+    line, emits the copies + a MIRROR constraint). **Live-verified** (`scripts/smoke_sketch_mirror.py`,
+    4 calls): a half-diamond mirrors across the Y axis into a 2.0 in³ rhombus, X bbox symmetric
+    [-1,1], sketch status `OK` (MIRROR constraint accepted, not over/under-constrained). Lines only
+    so far (arcs/circles a follow-up); edit-propagation not separately exercised. Still TODO:
+    in-sketch *pattern*, auto-dimension-to-fully-defined helper.
 
 ---
 

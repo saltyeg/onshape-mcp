@@ -172,6 +172,35 @@ def test_adjacent_finder_is_structurally_a_qadjacent_face_sweep():
     assert "evBox3d" in fs and "transientQueriesToStrings" in fs
 
 
+# MIRROR constraint live-verified in scripts/smoke_sketch_mirror.py (half-diamond -> 2.0in^3 rhombus).
+def test_add_mirror_reflects_lines_across_axis_and_links_with_mirror_constraint():
+    s = _session()
+    axis = s.add_line((0, 0), (0, 1), construction=True)   # the Y axis as a construction line
+    ln = s.add_line((1, 0), (1, 2))                         # a vertical line at x=1
+    mapping = s.add_mirror([ln], axis)
+    copy = mapping[ln]
+    e = [x for x in s.entities if x.get("entityId") == copy][0]
+    g = e["geometry"]
+    # reflected across x=0 -> x=-1, same height/length
+    assert abs(g["pntX"] / 0.0254 - (-1.0)) < 1e-9
+    assert abs(g["pntY"] / 0.0254 - 0.0) < 1e-9
+    assert abs(e["endParam"] / 0.0254 - 2.0) < 1e-9
+    # a MIRROR constraint ties original -> copy about the axis line
+    mir = [c for c in s.constraints if c["constraintType"] == "MIRROR"]
+    assert len(mir) == 1
+    vals = [p["value"] for p in mir[0]["parameters"] if p["btType"].startswith("BTMParameterString")]
+    assert vals == [ln, copy, axis]
+
+
+def test_add_mirror_rejects_non_line_entity():
+    import pytest
+    s = _session()
+    axis = s.add_line((0, 0), (0, 1), construction=True)
+    cir = s.add_circle((1, 1), 0.5)
+    with pytest.raises(ValueError):
+        s.add_mirror([cir], axis)       # lines only for now
+
+
 def test_on_plane_finders_test_thinness_and_coordinate_on_the_right_axis():
     from cadkit_mcp import selection as sel
     f = sel.fs_faces_on_plane("Z", 0.0)

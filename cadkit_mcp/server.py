@@ -380,6 +380,12 @@ async def list_tools() -> List[Tool]:
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "line1": {"type": "string"},
                           "line2": {"type": "string"}, "radius": {"type": "number"}},
                           "required": ["sessionId", "line1", "line2", "radius"]}),
+        Tool(name="cad_sketch_mirror", description="Mirror sketch lines across an existing line entity (the axis — e.g. a "
+             "construction line). Emits the reflected copies and a MIRROR constraint tying each copy to its original. "
+             "Lines only for now. Returns {originalId: copyId}.",
+             inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"},
+                          "entityIds": {"type": "array", "items": {"type": "string"}}, "axis": {"type": "string"}},
+                          "required": ["sessionId", "entityIds", "axis"]}),
         Tool(name="cad_sketch_rectangle", description="Add a constrained rectangle; returns {bottom,right,top,left} line ids.",
              inputSchema={"type": "object", "properties": {"sessionId": {"type": "string"}, "corner1": pt, "corner2": pt},
                           "required": ["sessionId", "corner1", "corner2"]}),
@@ -547,8 +553,9 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                                           target, a.get("name", "Sketch"))
             return _txt(json.dumps({"sessionId": sid}))
 
-        if name in ("cad_sketch_line","cad_sketch_circle","cad_sketch_arc","cad_sketch_fillet","cad_sketch_rectangle",
-                    "cad_sketch_polyline","cad_sketch_slot","cad_sketch_constrain","cad_sketch_dimension","cad_sketch_close"):
+        if name in ("cad_sketch_line","cad_sketch_circle","cad_sketch_arc","cad_sketch_fillet","cad_sketch_mirror",
+                    "cad_sketch_rectangle","cad_sketch_polyline","cad_sketch_slot","cad_sketch_constrain",
+                    "cad_sketch_dimension","cad_sketch_close"):
             s = SESSIONS.get(a.get("sessionId"))
             if not s:
                 return _txt(f"ERROR: unknown sessionId {a.get('sessionId')}")
@@ -560,6 +567,8 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
                 return _txt(json.dumps({"entityId": s.add_arc(a["center"], a["start"], a["end"], a.get("construction", False))}))
             if name == "cad_sketch_fillet":
                 return _txt(json.dumps(s.add_fillet(a["line1"], a["line2"], a["radius"])))
+            if name == "cad_sketch_mirror":
+                return _txt(json.dumps(s.add_mirror(a["entityIds"], a["axis"])))
             if name == "cad_sketch_rectangle":
                 return _txt(json.dumps(s.add_rectangle(a["corner1"], a["corner2"])))
             if name == "cad_sketch_slot":

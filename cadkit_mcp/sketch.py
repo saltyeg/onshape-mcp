@@ -198,6 +198,43 @@ class SketchSession:
         return {"arc": arc, "center": [O[0], O[1]],
                 "tangentPoints": [[T1[0], T1[1]], [T2[0], T2[1]]], "radius": radius}
 
+    def add_mirror(self, entity_ids: List[str], axis_line: str) -> Dict[str, str]:
+        """Mirror sketch LINES across an existing line entity (the axis).
+
+        Reflects each line's endpoints and emits the copy at the correct mirrored coordinates, so
+        the copy is geometrically right on its own; also adds a MIRROR constraint tying copy to
+        original so an edit to one propagates. Returns {originalId: copyId}.
+
+        Lines only for now (the common symmetric-profile case); arcs/circles are a follow-up. The
+        MIRROR constraint (localFirst/localSecond entities + `local` axis) is LIVE-VERIFIED: it
+        regenerates `OK` and produces the correct mirrored solid (scripts/smoke_sketch_mirror.py —
+        a half-diamond mirrors to a 2.0 in^3 rhombus, X bbox symmetric [-1,1]). Edit-propagation
+        isn't separately exercised, but the constraint is accepted and consistent (no over/under
+        -constrained error)."""
+        _, p1, p2 = self._line_points(axis_line)
+        dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+        dd = dx * dx + dy * dy
+        if dd == 0:
+            raise ValueError("mirror axis line is degenerate")
+
+        def reflect(q):
+            t = ((q[0] - p1[0]) * dx + (q[1] - p1[1]) * dy) / dd
+            fx, fy = p1[0] + t * dx, p1[1] + t * dy
+            return (2 * fx - q[0], 2 * fy - q[1])
+
+        mapping: Dict[str, str] = {}
+        for eid in entity_ids:
+            e = next((x for x in self.entities if x.get("entityId") == eid), None)
+            if e is None or not e["geometry"]["btType"].startswith("BTCurveGeometryLine"):
+                raise ValueError(f"{eid} is not a mirrorable line (lines only for now)")
+            _, s, en = self._line_points(eid)
+            copy = self.add_line(reflect(s), reflect(en))
+            mapping[eid] = copy
+            self.constraints.append(self._con("MIRROR", self._id("mir"),
+                [self._str(eid, "localFirst"), self._str(copy, "localSecond"),
+                 self._str(axis_line, "local")]))
+        return mapping
+
     def add_point(self, at: Tuple[float, float], construction: bool = False) -> str:
         """A standalone sketch point — used as a hole `locations` target (native Hole feature)."""
         px, py = at
