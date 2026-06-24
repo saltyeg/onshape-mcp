@@ -172,6 +172,17 @@ def test_adjacent_finder_is_structurally_a_qadjacent_face_sweep():
     assert "evBox3d" in fs and "transientQueriesToStrings" in fs
 
 
+def test_on_plane_finders_test_thinness_and_coordinate_on_the_right_axis():
+    from cadkit_mcp import selection as sel
+    f = sel.fs_faces_on_plane("Z", 0.0)
+    assert "minCorner[2]" in f and "maxCorner[2]" in f       # Z axis index
+    assert "abs(hi - lo)" in f and "abs((lo + hi)/2 - (0.0))" in f  # thin AND at the coord
+    assert sel.SOLID_FACES in f
+    e = sel.fs_edges_on_plane("X", 1.5)
+    assert "minCorner[0]" in e and "(1.5)" in e
+    assert sel.SOLID_EDGES in e
+
+
 def test_circle_arcs_tied_equal_so_one_dim_drives_whole_circle():
     # REGRESSION: a circle is two semicircle arcs; without an EQUAL tying them, a single
     # diameter/radius dim binds only the .a arc and the .b arc floats to the placeholder ->

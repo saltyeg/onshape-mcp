@@ -429,19 +429,20 @@ async def list_tools() -> List[Tool]:
                           "required": ["documentId","workspaceId","elementId","edgeIds","radius"]}),
         Tool(name="cad_find_edges", description="Find edges by geometry. kind: circular (radius+tol), concave/convex (inner/"
              "outer corners — concave is ideal for fillets), linear (axis X/Y/Z and/or through point), extreme (ALL edges "
-             "furthest along axis — e.g. axis=Z max=false for the bottom edges, to fillet at once). Returns deterministic ids.",
+             "furthest along axis — e.g. axis=Z max=false for the bottom edges, to fillet at once), on_plane (all edges "
+             "lying in the plane axis=coordinate, e.g. axis=Z coordinate=0). Returns deterministic ids.",
              inputSchema={"type": "object", "properties": {**ds,
-                          "kind": {"type": "string", "enum": ["circular","concave","convex","linear","extreme"]},
+                          "kind": {"type": "string", "enum": ["circular","concave","convex","linear","extreme","on_plane"]},
                           "radius": {"type": "number"}, "tolerance": {"type": "number"}, "axis": {"type": "string", "enum": ["X","Y","Z"]},
-                          "max": {"type": "boolean"}, "through": {"type": "array", "items": {}}},
+                          "max": {"type": "boolean"}, "through": {"type": "array", "items": {}}, "coordinate": {"type": "number"}},
                           "required": ["documentId","workspaceId","elementId","kind"]}),
         Tool(name="cad_find_faces", description="Find faces by geometry. kind: planar_by_normal (normal=[x,y,z]), cylindrical "
              "(radius+tol), largest/smallest (by area — e.g. the big flat face to sketch on), extreme (the face furthest "
-             "along axis — axis=Z max=true is the top face), adjacent_to_extreme (the faces bordering that extreme face). "
-             "Returns deterministic ids.",
+             "along axis — axis=Z max=true is the top face), adjacent_to_extreme (the faces bordering that extreme face), "
+             "on_plane (the planar face lying in axis=coordinate, e.g. axis=Z coordinate=0). Returns deterministic ids.",
              inputSchema={"type": "object", "properties": {**ds,
-                          "kind": {"type": "string", "enum": ["planar_by_normal","cylindrical","largest","smallest","extreme","adjacent_to_extreme"]},
-                          "normal": {"type": "array", "items": {"type": "number"}}, "radius": {"type": "number"},
+                          "kind": {"type": "string", "enum": ["planar_by_normal","cylindrical","largest","smallest","extreme","adjacent_to_extreme","on_plane"]},
+                          "normal": {"type": "array", "items": {"type": "number"}}, "radius": {"type": "number"}, "coordinate": {"type": "number"},
                           "axis": {"type": "string", "enum": ["X","Y","Z"]}, "max": {"type": "boolean"},
                           "tolerance": {"type": "number"}}, "required": ["documentId","workspaceId","elementId","kind"]}),
         Tool(name="cad_chamfer", description="Equal-distance chamfer on edges (deterministic ids from cad_find_edges). "
@@ -631,6 +632,7 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             if kind == "circular": script = sel.fs_circular_edges(a.get("radius"), tol)
             elif kind in ("concave", "convex"): script = sel.fs_concave_edges(kind.upper())
             elif kind == "extreme": script = sel.fs_extreme_edges(a["axis"], a.get("max", True), a.get("tolerance", 0.01))
+            elif kind == "on_plane": script = sel.fs_edges_on_plane(a["axis"], a["coordinate"], a.get("tolerance", 0.01))
             else: script = sel.fs_linear_edges(a.get("axis"), a.get("through"), a.get("tolerance", 0.005))
             res = await FS.evaluate(a["documentId"], a["workspaceId"], a["elementId"], script)
             return _txt(json.dumps({"edgeIds": sel.parse_ids(res)}))
@@ -642,6 +644,7 @@ async def dispatch(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             elif kind in ("largest", "smallest"): script = sel.fs_faces_by_area(kind == "largest")
             elif kind == "extreme": script = sel.fs_extreme_faces(a["axis"], a.get("max", True))
             elif kind == "adjacent_to_extreme": script = sel.fs_faces_adjacent_to_extreme(a["axis"], a.get("max", True))
+            elif kind == "on_plane": script = sel.fs_faces_on_plane(a["axis"], a["coordinate"], a.get("tolerance", 0.01))
             else: return _txt(json.dumps({"error": f"unknown face kind '{kind}'"}))
             res = await FS.evaluate(a["documentId"], a["workspaceId"], a["elementId"], script)
             return _txt(json.dumps({"faceIds": sel.parse_ids(res)}))

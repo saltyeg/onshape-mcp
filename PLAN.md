@@ -133,8 +133,11 @@ bugs the per-tool smokes could not:
     (`cad_find_faces` kind=adjacent_to_extreme — the faces bordering the extreme face, composed in
     one eval so no transient id is round-tripped). **Live-verified** — the `qAdjacent(query,
     AdjacencyType.EDGE, EntityType.FACE)` signature returned the 5 side faces of a filleted box
-    (`scripts/smoke_fillet_adjacency.py`); qAdjacent already excludes the seed. Still TODO: by tag,
-    on-a-given plane. (FS gotcha: divide out units before comparing — see [[onshape-feature-errors]].)
+    (`scripts/smoke_fillet_adjacency.py`); qAdjacent already excludes the seed. ✅ *on a given plane*
+    (`cad_find_faces`/`cad_find_edges` kind=on_plane, axis+coordinate — the planar face / all edges
+    lying in axis=coord, e.g. Z=0; tests thin-along-axis AND at-coord). Built on `evBox3d`, the same
+    primitive `fs_extreme_*` live-verified, so offline-confident without a separate smoke. Still TODO:
+    by tag. (FS gotcha: divide out units before comparing — see [[onshape-feature-errors]].)
 15. **Sketch ergonomics** — ✅ *slot* (`cad_sketch_slot`: obround = rectangle + a circle each end,
     extrude-unions to one clean solid — verified 2.6×0.6), ✅ *construction geometry* exposed on
     line + circle + arc, and ✅ *center-point arc* (`cad_sketch_arc`: one BTMSketchCurveSegment on a
